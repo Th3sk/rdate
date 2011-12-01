@@ -45,7 +45,7 @@ ARGV.each do |arg|
       date -= 1
     end
   else
-    format = arg
+    format = arg.sub(/^\+/,'')
   end
 end
 
