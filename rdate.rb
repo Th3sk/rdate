@@ -1,0 +1,53 @@
+#!/usr/bin/env ruby
+
+require 'date'
+
+date = DateTime.now
+format = "%a %b %e %H:%M:%S %Z %Y"
+
+def fix_year(year)
+  if year >= 1980
+    year
+  elsif year >= 80
+    year + 1900
+  else
+    year + 2000
+  end
+end
+
+ARGV.each do |arg|
+  case arg
+  when /^-v(\d+)y$/
+    year = fix_year($1.to_i)
+    date = DateTime.new(year, date.month, date.day, date.hour, date.minute, date.second, date.offset)
+  when /^-v([-+])(\d+)y$/
+    date = DateTime.new(date.year.__send__($1.to_sym, $2.to_i), date.month, date.day, date.hour, date.minute, date.second, date.offset)
+  when /^-v(\d+)m$/
+    date = DateTime.new(date.year, $1.to_i, date.day, date.hour, date.minute, date.second, date.offset)
+  when /^-v(\d+)d$/
+    date = DateTime.new(date.year, date.month, $1.to_i, date.hour, date.minute, date.second, date.offset)
+  when /^-v(\d+)H$/
+    date = DateTime.new(date.year, date.month, date.day, $1.to_i, date.minute, date.second, date.offset)
+  when /^-v(\d+)M$/
+    date = DateTime.new(date.year, date.month, date.day, date.hour, $1.to_i, date.second, date.offset)
+  when /^-v(\d+)S$/
+    date = DateTime.new(date.year, date.month, date.day, date.hour, date.minute, $1.to_i, date.offset)
+  when /^-v\+(\d+)m$/
+    date = date >> $1.to_i
+  when /^-v\-(\d+)m$/
+    date = date << $1.to_i
+  when /^-v\+(\d+)d$/
+    date += $1.to_i
+  when /^-v-(\d+)d$/
+    date -= $1.to_i
+  when /^-v-(\w+)$/
+    until date.strftime("%a").downcase == $1
+      date -= 1
+    end
+  else
+    format = arg
+  end
+end
+
+time = Time.local(date.year,date.month,date.day,date.hour,date.minute,date.second)
+puts time.strftime(format)
